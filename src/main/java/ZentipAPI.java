@@ -1,17 +1,22 @@
 import co.flock.www.model.messages.Attachments.*;
 import co.flock.www.model.messages.Message;
+import com.google.gson.Gson;
 import model.ZenTip;
 
 public class ZentipAPI {
 
     private static final String LIKE_BUTTON_ICON = "https://f.flock.co/a49cd4b14719892015a7d2ee";
+    private static final String TWEET_BUTTON_ICON = "https://f.flock.co/a49cd4b1471994305894837d";
+    private static final String FOLLOW_BUTTON_ICON = "https://f.flock.co/a49cd4b14719960893716dc8";
+    private static final String UNSUBSCRIBE_BUTTON_ICON = "https://cdn4.iconfinder.com/data/icons/vectory-bonus-1/40/rss_delete-128.png";
     private static final String THANKS_BUTTON_ICON = "https://f.flock.co/a49cd4b1471988939a597be9";
-    private static final String TWEET_BUTTON_ICON = "https://f.flock.co/a49cd4b1471989314798cfe4";
 
     public static void createMessage(ZenTip zenTip) {
-        Message message = new Message(zenTip.getTo(), zenTip.getMessage());
+        String msg = "*" + "#" + zenTip.getTag() + "*";
+        Message message = new Message(zenTip.getTo(), msg);
 
         Attachment attachment = new Attachment();
+        attachment.setDescription(zenTip.getMessage());
 
         View view = new View();
         ImageView imageView = new ImageView();
@@ -21,7 +26,7 @@ public class ZentipAPI {
         view.setImage(imageView);
         attachment.setViews(view);
 
-        Button[] buttons = new Button[3];
+        Button[] buttons = new Button[5];
 
         buttons[0] = new Button();
         buttons[0].setId("button-0-id");
@@ -33,19 +38,35 @@ public class ZentipAPI {
 
         buttons[1] = new Button();
         buttons[1].setId("button-1-id");
-        buttons[1].setIcon(THANKS_BUTTON_ICON);
-        buttons[1].setName("Say Thanks");
+        buttons[1].setIcon(TWEET_BUTTON_ICON);
+        buttons[1].setName("Tweet");
         action = new Action();
         action.addDispatchEvent();
         buttons[1].setAction(action);
 
         buttons[2] = new Button();
         buttons[2].setId("button-2-id");
-        buttons[2].setIcon(TWEET_BUTTON_ICON);
-        buttons[2].setName("Tweet");
+        buttons[2].setIcon(FOLLOW_BUTTON_ICON);
+        buttons[2].setName("Follow");
         action = new Action();
         action.addDispatchEvent();
         buttons[2].setAction(action);
+
+        buttons[3] = new Button();
+        buttons[3].setId("button-3-id");
+        buttons[3].setIcon(THANKS_BUTTON_ICON);
+        buttons[3].setName("Appreciate");
+        action = new Action();
+        action.addDispatchEvent();
+        buttons[3].setAction(action);
+
+        buttons[4] = new Button();
+        buttons[4].setId("button-4-id");
+        buttons[4].setIcon(UNSUBSCRIBE_BUTTON_ICON);
+        buttons[4].setName("Unsubscribe");
+        action = new Action();
+        action.addDispatchEvent();
+        buttons[4].setAction(action);
 
         attachment.setButtons(buttons);
 
