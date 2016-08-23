@@ -1,6 +1,11 @@
 import org.json.JSONObject;
+import spark.ModelAndView;
 
 import static spark.Spark.*;
+
+import spark.template.mustache.MustacheTemplateEngine;
+
+import java.util.HashMap;
 
 public class ZenRunner {
 
@@ -10,6 +15,18 @@ public class ZenRunner {
 
     private static void startServer() {
         port(8000);
+
+        staticFileLocation("/public");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("resourcePrefix", "");
+        get("/new", (req, res) -> new ModelAndView(map, "newInfoTip.html"),
+                new MustacheTemplateEngine());
+
+        post("/create", (req, res) -> {
+            String body = req.body();
+            System.out.println(body);
+            return "Info tip created";
+        });
 
         post("/", (req, res) -> {
             JSONObject jsonObject = new JSONObject(req.body());
