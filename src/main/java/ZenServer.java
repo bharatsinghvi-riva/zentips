@@ -7,10 +7,10 @@ import spark.template.mustache.MustacheTemplateEngine;
 
 import java.util.HashMap;
 
-public class ZenRunner {
+public class ZenServer {
 
     public static void main(String[] args) {
-        ZenRunner.startServer();
+        ZenServer.startServer();
     }
 
     private static void startServer() {
