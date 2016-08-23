@@ -2,12 +2,13 @@ $(document).ready(function()
 {
      $("#submit").click(function () {
          var tag = $("#tag").val();
-         var desc = $("#desc").val();
+         var title = $("#title").val();
+         var message = $("#msg").val();
          var event = decodeURIComponent(getQueryVariable("flockEvent"));
          var parsedEvent = JSON.parse(event);
-         var authorId = parsedEvent.userId;
-         var sentToId = parsedEvent.chat;
-         createZenTip(tag, desc, authorId, sentToId);
+         var from = parsedEvent.userId;
+         var to = parsedEvent.chat;
+         createZenTip(tag, title, message, from, to);
          flock.close();
      });
 
@@ -27,9 +28,10 @@ $(document).ready(function()
           payload =
           {
               "tag": tag,
-              "desc": desc,
-              "authorId": authorId,
-              "sentToId": sentToId
+              "title": title,
+              "message": message,
+              "from": authorId,
+              "to": sentToId
           };
           sendAjaxRequest("https://10a49f0a.ngrok.io/create", "post", payload, function (response) {
               console.log("successful response: " + JSON.stringify(response));
