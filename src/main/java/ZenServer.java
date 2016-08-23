@@ -1,3 +1,5 @@
+import co.flock.www.model.messages.Message;
+import model.ZenTip;
 import org.json.JSONObject;
 import spark.ModelAndView;
 
@@ -23,9 +25,10 @@ public class ZenServer {
                 new MustacheTemplateEngine());
 
         post("/create", (req, res) -> {
-            String body = req.body();
-            System.out.println(body);
-            return "Info tip created";
+            JSONObject jsonObject = new JSONObject(req.body());
+            System.out.println(req.body());
+            handleNewTipCreation(jsonObject);
+            return "New tip created";
         });
 
         post("/", (req, res) -> {
@@ -52,6 +55,17 @@ public class ZenServer {
     private static void handleSlashCommand(JSONObject jsonObject) {
         String userId = jsonObject.getString("userId");
         String text = jsonObject.getString("text");
+    }
+
+    private static void handleNewTipCreation(JSONObject jsonObject) {
+        String tag = jsonObject.getString("tag");
+        String image = jsonObject.getString("image");
+        String message = jsonObject.getString("message");
+        String from = jsonObject.getString("from");
+        String to = jsonObject.getString("to");
+        MessagingService.sendMessage(new Message(from, "test"));
+        ZenTip zenTip = new ZenTip(tag, image, message, from, to);
+        ZentipAPI.createMessage(zenTip);
     }
 
 }
