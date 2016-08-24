@@ -1,7 +1,11 @@
 import co.flock.www.model.messages.Attachments.*;
 import co.flock.www.model.messages.Message;
-import com.google.gson.Gson;
+import model.Subscriptions;
+import model.Tags;
 import model.ZenTip;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ZentipAPI {
 
@@ -10,6 +14,19 @@ public class ZentipAPI {
     private static final String FOLLOW_BUTTON_ICON = "https://f.flock.co/a49cd4b14719960893716dc8";
     private static final String UNSUBSCRIBE_BUTTON_ICON = "https://cdn4.iconfinder.com/data/icons/vectory-bonus-1/40/rss_delete-128.png";
     private static final String THANKS_BUTTON_ICON = "https://f.flock.co/a49cd4b1471988939a597be9";
+
+    public ZentipAPI() {
+        addDefaultTags();
+    }
+
+    public static void addDefaultTags() {
+        Tags tags = new Tags();
+        tags.addTag("Android");
+        tags.addTag("TechCrunch");
+        tags.addTag("FlockSales");
+        tags.addTag("FlockBlog");
+        tags.addTag("Directi");
+    }
 
     public static void createMessage(ZenTip zenTip) {
         String msg = "*" + "#" + zenTip.getTag() + "*";
@@ -77,4 +94,12 @@ public class ZentipAPI {
         MessagingService.sendMessage(message);
     }
 
+    public static void getTags(String userId) {
+        List<String> tags = new ArrayList<>(new Tags().getTags());
+        String msg = "Current tags are: \n";
+        for (String tag : tags) {
+            msg += tag + "\n";
+        }
+        MessagingService.sendMessage(new Message(userId, msg));
+    }
 }
