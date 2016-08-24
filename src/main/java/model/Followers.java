@@ -1,7 +1,9 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class Followers {
 
@@ -20,5 +22,9 @@ public class Followers {
         if (followers.containsKey(follow)) {
             followers.get(follow).remove(follower);
         }
+    }
+
+    public List<String> getFollowers(String userId) {
+        return new ArrayList<>(followers.get(userId));
     }
 }
