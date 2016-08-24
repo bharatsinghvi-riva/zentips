@@ -1,4 +1,5 @@
 import co.flock.www.model.messages.Message;
+import model.Subscriptions;
 import model.ZenTip;
 import org.json.JSONObject;
 import spark.ModelAndView;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 public class ZenServer {
 
     public static void main(String[] args) {
+        new ZentipAPI();
         ZenServer.startServer();
     }
 
@@ -55,6 +57,15 @@ public class ZenServer {
     private static void handleSlashCommand(JSONObject jsonObject) {
         String userId = jsonObject.getString("userId");
         String text = jsonObject.getString("text");
+        if (text.startsWith("topics")) {
+            ZentipAPI.getTags(userId);
+        } else if (text.startsWith("subscribe")) {
+            new Subscriptions().addSubscription(text.substring("subscribe".length()), userId);
+        } else if (text.startsWith("subscriptions")) {
+            MessagingService.sendMessage(new Message(userId, new Subscriptions().getSubscriptionsForUser(userId).toString()));
+        } else if (text.startsWith("unsubscribe")) {
+            MessagingService.sendMessage(new Message(userId, "Unsubscribe successful"));
+        }
     }
 
     private static void handleNewTipCreation(JSONObject jsonObject) {
