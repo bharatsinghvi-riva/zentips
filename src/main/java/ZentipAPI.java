@@ -1,10 +1,9 @@
 import co.flock.www.model.messages.Attachments.*;
 import co.flock.www.model.messages.Message;
-import model.Subscriptions;
-import model.Tags;
-import model.ZenTip;
+import model.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ZentipAPI {
@@ -14,6 +13,8 @@ public class ZentipAPI {
     private static final String FOLLOW_BUTTON_ICON = "https://f.flock.co/a49cd4b14719960893716dc8";
     private static final String UNSUBSCRIBE_BUTTON_ICON = "https://cdn4.iconfinder.com/data/icons/vectory-bonus-1/40/rss_delete-128.png";
     private static final String THANKS_BUTTON_ICON = "https://f.flock.co/a49cd4b1471988939a597be9";
+
+    private static final HashMap<String, User> users = new HashMap<>();
 
     public ZentipAPI() {
         addDefaultTags();
@@ -26,6 +27,10 @@ public class ZentipAPI {
         tags.addTag("FlockSales");
         tags.addTag("FlockBlog");
         tags.addTag("Directi");
+    }
+
+    public static void addUser(User user) {
+        users.put(user.getUserId(), user);
     }
 
     public static void createMessage(ZenTip zenTip) {
@@ -58,19 +63,22 @@ public class ZentipAPI {
         buttons[1].setIcon(TWEET_BUTTON_ICON);
         buttons[1].setName("Tweet");
         action = new Action();
-        action.addDispatchEvent();
+        action.addOpenBrowser("http://www.twitter.com", false);
         buttons[1].setAction(action);
 
         buttons[2] = new Button();
-        buttons[2].setId("button-2-id");
+        String buttonId = isFollowing(zenTip) ? "unfollow" : "follow";
+        buttonId += "-" + zenTip.getFrom();
+        buttons[2].setId(buttonId);
         buttons[2].setIcon(FOLLOW_BUTTON_ICON);
-        buttons[2].setName("Follow");
+        String buttonName = isFollowing(zenTip) ? "Unfollow" : "Follow";
+        buttons[2].setName(buttonName);
         action = new Action();
         action.addDispatchEvent();
         buttons[2].setAction(action);
 
         buttons[3] = new Button();
-        buttons[3].setId("button-3-id");
+        buttons[3].setId("appreciate-" + zenTip.getFrom());
         buttons[3].setIcon(THANKS_BUTTON_ICON);
         buttons[3].setName("Appreciate");
         action = new Action();
@@ -78,9 +86,11 @@ public class ZentipAPI {
         buttons[3].setAction(action);
 
         buttons[4] = new Button();
-        buttons[4].setId("button-4-id");
+        buttonId = isSubscribed(zenTip) ? "unsubscribe" : "subscribe";
+        buttons[4].setId(buttonId + "-" + zenTip.getTag());
         buttons[4].setIcon(UNSUBSCRIBE_BUTTON_ICON);
-        buttons[4].setName("Unsubscribe");
+        buttonName = isSubscribed(zenTip) ? "Unsubscribe" : "Subscribe";
+        buttons[4].setName(buttonName);
         action = new Action();
         action.addDispatchEvent();
         buttons[4].setAction(action);
@@ -91,7 +101,7 @@ public class ZentipAPI {
         attachments[0] = attachment;
 
         message.setAttachments(attachments);
-        MessagingService.sendMessage(message);
+        MessagingService.sendMessage(users.get(zenTip.getFrom()).getUserToken(), message);
     }
 
     public static void getTags(String userId) {
@@ -100,6 +110,18 @@ public class ZentipAPI {
         for (String tag : tags) {
             msg += tag + "\n";
         }
-        MessagingService.sendMessage(new Message(userId, msg));
+        MessagingService.sendMessage(users.get(userId).getUserToken(), new Message(userId, msg));
+    }
+
+    private static boolean isFollowing(ZenTip zenTip) {
+        return new Followers().isFollower(zenTip.getFrom(), zenTip.getTo());
+    }
+
+    private static boolean isSubscribed(ZenTip zentip) {
+        return new Subscriptions().getSubscribersForTag(zentip.getTag()).contains(zentip.getTo());
+    }
+
+    public static String getUserToken(String userId) {
+        return users.get(userId).getUserToken();
     }
 }
